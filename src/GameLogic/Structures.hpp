@@ -2,9 +2,7 @@
 
 struct Feature
 {
-    bool shockResist;
-    bool flamable;
-    unsigned int electricCost;
+    
     std::string getDescriptionText();
 };
 
@@ -30,6 +28,16 @@ private:
     int deltaClock;
 
     Feature feature;
+
+    bool shockResist;
+
+    bool flamable;
+
+    unsigned int electricCost;
+    
+    int populationGain;
+
+    std::string describtion;
 
 public:
 
