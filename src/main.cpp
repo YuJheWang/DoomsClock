@@ -1,21 +1,17 @@
-#include <SDL2/SDL.h>
-#include <iostream>
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Box.H>
 
-SDL_Window* window = nullptr;
-
-int main()
+int main(int argc, char* argv[])
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    window = SDL_CreateWindow(
-        "Dooms clock", 
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        1080, 720,
-        SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_SHOWN
-    );
-    if (window == nullptr)
-    {
-        std::cerr << "Fail to create window!" << std::endl;
-        SDL_Quit();
-    }
+    Fl_Window* window = new Fl_Window(1080, 720);
+    window->fullscreen();
+    Fl_Box* label = new Fl_Box(20, 0, 200, 100, "hello, world!");
+    label->box(FL_FLAT_BOX);
+    label->labelfont(FL_BOLD + FL_ITALIC);
+    label->labelsize(36);
+    label->labeltype(FL_SHADOW_LABEL);
+    window->end();
+    window->show(argc, argv);
+    return Fl::run();
 }

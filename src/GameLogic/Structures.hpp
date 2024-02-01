@@ -1,21 +1,22 @@
 #include <string>
-
-struct Feature
-{
-    
-    std::string getDescriptionText();
-};
+#include <sstream>
 
 struct Resources
 {
     int log, iron, coal, food;
+    std::string getDescribtionText();
 };
 
 struct Size { unsigned int width, height; };
 
-class Structure
+struct Describtion
 {
-private:
+    std::string name;
+    std::string text;
+};
+
+struct Structure
+{
 
     std::string name;
 
@@ -27,9 +28,7 @@ private:
 
     int deltaClock;
 
-    Feature feature;
-
-    bool shockResist;
+    bool earthquakeResist;
 
     bool flamable;
 
@@ -37,8 +36,19 @@ private:
     
     int populationGain;
 
-    std::string describtion;
-
-public:
+    std::string describtionText;
 
 };
+
+enum StructureIndex { 
+    Factory,
+    FirePowerPlant,
+    NuclearPowerPlant,
+    FireDepartment,
+    Park,
+    Coal,
+    Farm,
+    Storage,
+    All
+};
+Structure structures[All];
