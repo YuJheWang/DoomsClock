@@ -35,7 +35,7 @@ struct Structure
 
     unsigned int electricCost;
 
-    std::string describtionText;
+    std::string descriptionText;
 
 };
 
@@ -64,6 +64,6 @@ void initialize_structures()
         false,          //earthquakeResist 耐震:true、不耐震:false
         false,          //flamable         易燃:true、不易燃:false
         3,              //electricCost
-        ""              //describtion      先空著，我到時候再想
+        ""              //description      先空著，我到時候再想
     };
 }
