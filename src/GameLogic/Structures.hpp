@@ -44,6 +44,8 @@ enum StructureIndex {
     FirePowerPlant,
     NuclearPowerPlant,
     FireDepartment,
+    WindPowerPlant,
+    ResidentialArea,
     Park,
     Coal,
     Farm,
@@ -65,5 +67,104 @@ void initialize_structures()
         false,          //flamable         易燃:true、不易燃:false
         3,              //electricCost
         ""              //description      先空著，我到時候再想
+    };
+    structures[FirePowerPlant] = {
+        "火力發電廠",
+        {1, 1, 3, 0},
+        0,
+        {1, 2},
+        3,
+        true,
+        true,
+        3,
+        ""
+    };
+    structures[WindPowerPlant] = {
+        "風力發電廠",
+        {1, 2, 0, 0},
+        0,
+        {1, 1},
+        3,
+        false,
+        true,
+        1,
+        ""
+    };
+    structures[NuclearPowerPlant] = {
+        "核能發電廠",
+        {5, 5, 0, 0},
+        0,
+        {2, 2},
+        0,            //if(NuclearDisaster==true) 15
+        true,
+        true,
+        5,
+        ""
+    };
+    structures[FireDepartment] = {
+        "消防局",
+        {2, 1, 0, 0},
+        0,
+        {1, 1},
+        0,
+        true,
+        false,
+        0,            //unkown
+        ""
+    };
+    structures[ResidentialArea] = {
+        "住宅區",
+        {2, 0, 0, 0},
+        0,
+        {1, 1},
+        1,
+        false,
+        true,
+        1,
+        ""
+    };
+    structures[Park] = {
+        "公園",
+        {1, 0, 0, 0},
+        0,
+        {1, 1},
+        -1,
+        false,
+        true,
+        0,            //unkown
+        ""
+    };
+    structures[Coal] = {
+        "煤礦場",
+        {1, 2, 0, 0},
+        0,
+        {1, 2},
+        2,
+        false,
+        false,
+        0,            //unkown
+        ""
+    };
+    structures[Farm] = {
+        "農地",
+        {0, 0, 0, 0}, //unkown
+        0,
+        {1, 1},
+        0,
+        true,
+        true,
+        0,            //unkown
+        ""
+    };
+    structures[Storage] = {
+        "糧倉",
+        {2, 0, 0, 0},
+        0,
+        {1, 2},
+        0,
+        false,
+        true,
+        0,            //unkown
+        ""
     };
 }
