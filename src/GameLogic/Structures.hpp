@@ -3,10 +3,7 @@
 #include <string>
 #include <sstream>
 
-struct Resources
-{
-    int log, iron, coal, food;
-};
+struct Resources { int log, iron, coal, food; };
 
 struct Size { unsigned int width, height; };
 
