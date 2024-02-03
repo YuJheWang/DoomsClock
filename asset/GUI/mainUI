@@ -1,0 +1,27 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0308
+header_name {.h}
+code_name {.cxx}
+Function {} {open
+} {
+  Fl_Window {} {open
+    xywh {439 281 404 226} type Double hide
+  } {
+    Fl_Button {} {
+      label button
+      xywh {1280 680 105 50}
+    }
+    Fl_Repeat_Button {} {
+      label button
+      xywh {185 25 195 95}
+    }
+    Fl_Group {} {
+      label Resources open
+      xywh {895 485 270 170}
+    } {
+      Fl_Scroll {} {open
+        xywh {1120 490 20 120}
+      } {}
+    }
+  }
+}
