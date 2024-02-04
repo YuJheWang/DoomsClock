@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include "UI/UISystem.hpp"
+
 SDL_Window* window = nullptr;
 
 SDL_GLContext glContext = nullptr; 
@@ -15,6 +17,9 @@ int main(int argc, char* argv[])
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     window = SDL_CreateWindow(
         "Dooms Clock", 
@@ -48,6 +53,8 @@ int main(int argc, char* argv[])
     SDL_GetWindowSize(window, &width, &height);
     glViewport(0, 0, width, height);
 
+    UISystem ui(window, glContext);
+
     bool running = true;
     while (running)
     {
@@ -61,6 +68,13 @@ int main(int argc, char* argv[])
                     running = false;
             }
         }
+
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
+
+        ui.loop(event);
+
+        SDL_GL_SwapWindow(window);
     }
 
     SDL_DestroyWindow(window);
