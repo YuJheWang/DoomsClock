@@ -8,3 +8,4 @@ A SDG learning game
 ### 編譯
     cd DoomsClock
     cd src
+    make
