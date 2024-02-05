@@ -5,7 +5,7 @@
 
 struct Resources { int log, iron, coal, food; };
 
-struct Size { unsigned int width, height; };
+struct Size { unsigned int x, y; };
 
 struct Describtion
 {
@@ -69,7 +69,7 @@ void initialize_structures()
         "火力發電廠",
         {1, 1, 3, 0},
         0,
-        {1, 2},
+        {2, 2},
         3,
         true,
         true,
@@ -135,7 +135,7 @@ void initialize_structures()
         "煤礦場",
         {1, 2, 0, 0},
         0,
-        {1, 2},
+        {2, 2},
         2,
         false,
         false,
