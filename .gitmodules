@@ -1,3 +1,6 @@
 [submodule "thirdparty/imgui"]
 	path = thirdparty/imgui
 	url = https://github.com/YuJheWang/imgui.git
+[submodule "thirdparty/sdl-gpu"]
+	path = thirdparty/sdl-gpu
+	url = https://github.com/grimfang4/sdl-gpu.git
