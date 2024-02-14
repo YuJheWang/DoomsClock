@@ -5,7 +5,8 @@
 
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
-#include <imgui_impl_sdlrenderer2.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_opengl3_loader.h>
 
 #include "homePage.hpp"
 
@@ -13,7 +14,7 @@ class UISystem
 {
 public:
 
-    UISystem(SDL_Window* window, SDL_Renderer* renderer);
+    UISystem(SDL_Window* window, SDL_GLContext context);
 
     void loop(SDL_Event& event);
 
@@ -27,7 +28,7 @@ private:
 
 };
 
-UISystem::UISystem(SDL_Window* window, SDL_Renderer* renderer)
+UISystem::UISystem(SDL_Window* window, SDL_GLContext context)
 {
     ImGui::CreateContext();
     io = &ImGui::GetIO();
@@ -37,15 +38,15 @@ UISystem::UISystem(SDL_Window* window, SDL_Renderer* renderer)
 
     currentUI = new HomePage;
 
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer2_Init(renderer);
+    ImGui_ImplSDL2_InitForOpenGL(window, context);
+    ImGui_ImplOpenGL3_Init();
 }
 
 void UISystem::loop(SDL_Event& event)
 {
     ImGui_ImplSDL2_ProcessEvent(&event);
 
-    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
@@ -54,14 +55,13 @@ void UISystem::loop(SDL_Event& event)
     currentUI->render();
 
     ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 UISystem::~UISystem()
 {
     delete currentUI;
 
-    ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
 }

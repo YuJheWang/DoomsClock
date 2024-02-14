@@ -58,7 +58,7 @@ void initialize_structures()
         "工廠",         //name
         {1, 1, 1, 0},   //resourceCost     {log, iron, coal, food}
         0,              //populationGain
-        {1, 2},         //size
+        {2, 1},         //size
         3,              //deltaClock
         false,          //earthquakeResist 耐震:true、不耐震:false
         false,          //flamable         易燃:true、不易燃:false
@@ -124,7 +124,7 @@ void initialize_structures()
         "公園",
         {1, 0, 0, 0},
         0,
-        {1, 1},
+        {2, 1},
         -1,
         false,
         true,
@@ -157,7 +157,7 @@ void initialize_structures()
         "糧倉",
         {2, 0, 0, 0},
         0,
-        {1, 2},
+        {2, 1},
         0,
         false,
         true,

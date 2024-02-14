@@ -1,13 +1,17 @@
 #include <glad/glad.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_opengl.h>
 
 #include <iostream>
 
 #include "UI/UISystem.hpp"
+#include "Render/SceneRender.hpp"
 
 SDL_Window* window = nullptr;
-SDL_Renderer* renderer = nullptr;
+SDL_GLContext context = nullptr;
+
+SceneRender sceneRender;
 
 int main(int argc, char* argv[])
 {
@@ -26,12 +30,28 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    context = SDL_GL_CreateContext(window);
+    if (context == nullptr)
+    {
+        std::cerr << "Fail to create OpenGL Context!" << std::endl;
+        SDL_Quit();
+        return -1;
+    }
+
+    if (!gladLoadGLLoader((GLADloadproc) SDL_GL_GetProcAddress))
+    {
+        std::cerr << "Fail to initialize GLAD!" << std::endl;
+        SDL_Quit();
+        return -1;
+    }
+
+    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 
     int width, height;
     SDL_GetWindowSize(window, &width, &height);
+    glViewport(0, 0, width, height);
 
-    UISystem ui(window, renderer);
+    UISystem ui(window, context);
 
     bool running = true;
     while (running)
@@ -47,14 +67,14 @@ int main(int argc, char* argv[])
             }
         }
 
-        SDL_RenderClear(renderer);
+        //sceneRender.render();
 
         ui.loop(event);
 
-        SDL_RenderPresent(renderer);
+        SDL_GL_SwapWindow(window);
     }
 
-    SDL_DestroyRenderer(renderer);
+    SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
 

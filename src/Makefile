@@ -1,8 +1,8 @@
-INCLUDE = -IC:/msys64/mingw64/bin/../include/SDL2 -Dmain=SDL_main\
+INCLUDE = -I. -IC:/msys64/mingw64/bin/../include/SDL2 -Dmain=SDL_main\
 -I..\thirdparty\glad-master\include \
 -I..\thirdparty\imgui -I..\thirdparty\imgui\backends -I..\thirdparty\imgui\misc\cpp\
 -IC:/msys64/mingw64/include/libpng16 -DHWY_SHARED_DEFINE \
--IC:/msys64/mingw64/include/webp -DLIBDEFLATE_DLL
+-IC:/msys64/mingw64/include/webp -DLIBDEFLATE_DLL 
 
 LIBS = -LC:/msys64/mingw64/bin/../lib -lSDL2_image -lmingw32 -lSDL2main -lSDL2
 IMGUI_SRC = ../thirdparty/imgui/imgui.cpp ../thirdparty/imgui/imgui_demo.cpp \
