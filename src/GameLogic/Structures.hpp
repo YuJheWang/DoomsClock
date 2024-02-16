@@ -7,12 +7,6 @@ struct Resources { int log, iron, coal, food; };
 
 struct Size { unsigned int x, y; };
 
-struct Describtion
-{
-    std::string name;
-    std::string text;
-};
-
 struct Structure
 {
 
