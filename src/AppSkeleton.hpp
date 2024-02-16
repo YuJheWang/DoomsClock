@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
-#include "shader.hpp"
+#include "Render/shader.hpp"
 
 class AppSkeleton
 {
@@ -87,6 +87,7 @@ AppSkeleton::AppSkeleton(const char* title, bool fullscreen) : _fullscreen(fulls
 
 void AppSkeleton::loop()
 {
+    std::cout << "start loop" << std::endl;
     while (running)
     {
         SDL_Event event;
@@ -114,7 +115,7 @@ void AppSkeleton::loop()
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
+        glClearColor(0.0f, 0.4f, 0.4f, 1.0f);
 
         render();
 

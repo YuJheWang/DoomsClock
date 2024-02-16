@@ -2,6 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <cstring>
 
 #include <glad/glad.h>
 #include <GameLogic/Structures.hpp>
@@ -10,6 +11,8 @@
 #include "Camera.hpp"
 
 #include <algorithm>
+
+#define IMAGE_FILE_NAME(structure) strcat(strcat("../assets/AIGenerated/bgRemoved/", structure), ".png")
 
 struct Vec3 { float x, y, z; };
 
@@ -40,6 +43,32 @@ struct ImageData
     int channel;
 };
 
+const char* imageFileName[All] = {
+    "../asset/AIGenerated/bgRemoved/factory.png",
+    "../asset/AIGenerated/bgRemoved/firePowerPlant.png",
+    "../asset/AIGenerated/bgRemoved/nuclearPlant.png",
+    "../asset/AIGenerated/bgRemoved/fireDepartment.png",
+    "../asset/AIGenerated/bgRemoved/windPowerPlant.png",
+    "../asset/AIGenerated/bgRemoved/residentialArea.png",
+    "../asset/AIGenerated/bgRemoved/park.png",
+    "../asset/AIGenerated/bgRemoved/coal.png",
+    "../asset/AIGenerated/bgRemoved/farm.png",
+    "../asset/AIGenerated/bgRemoved/storage.png"
+};
+
+float structureHeight[All] = {
+    2.0f,
+    4.0f,
+    2.0f,
+    4.0f,
+    4.0f,
+    4.0f,
+    4.0f,
+    2.0f,
+    1.0f,
+    4.0f
+};
+
 class StructureRender
 {
 public:
@@ -48,7 +77,7 @@ public:
 
     ~StructureRender();
 
-    void bind(const Structure& structure, const char* imageFile);
+    void bind(unsigned int structure);
 
     void render(const glm::mat4& viewMat, const glm::ivec2& position, const glm::mat4& projMat);
 
@@ -61,6 +90,8 @@ private:
     Shader shader;
 
     Structure _structure;
+
+    float height;
 
     ImageData imageData;
 
@@ -81,8 +112,13 @@ StructureRender::~StructureRender()
     stbi_image_free(imageData.data);
 }
 
-void StructureRender::bind(const Structure& structure, const char* imageFile)
+void StructureRender::bind(unsigned int structure)
 {
+    if (
+        structure == Factory || structure == WindPowerPlant || structure == Coal ||
+        structure == Farm    || structure == Storage
+    ) return;
+
     shader.loadFromFile("../asset/shaders/structure.vs.glsl", "../asset/shaders/structure.fs.glsl");
 
     glGenVertexArrays(1, &vao);
@@ -110,16 +146,22 @@ void StructureRender::bind(const Structure& structure, const char* imageFile)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-    _structure = structure;
+    _structure = structures[structure];
+    height = structureHeight[structure];
 
-    imageData.data = stbi_load(imageFile, &imageData.width, &imageData.height, &imageData.channel, 0);
-    if (imageData.data == NULL) std::cerr << "Fail to load image data!\nFile: " << imageFile << "\n";
+    imageData.data = stbi_load(
+        imageFileName[structure], 
+        &imageData.width, &imageData.height,
+        &imageData.channel, 0
+    );
+    if (imageData.data == NULL)
+        std::cerr << "Fail to load image data!\nFile: " << imageFileName[structure] << "\n";
     else 
     {
         glTexImage2D(
             GL_TEXTURE_2D, 
-            0, 
-            GL_RGBA, 
+            0,
+            GL_RGBA,
             imageData.width, imageData.height, 
             0, 
             GL_RGBA, 
@@ -135,9 +177,11 @@ void StructureRender::render(const glm::mat4& viewMat, const glm::ivec2& positio
 {
     shader.setUniform("viewMat", viewMat);
     shader.setUniform("projMat", projMat);
-    shader.setUniform("scale", glm::scale(glm::vec3(_structure.size.x, 4.0f, _structure.size.y)));
+    shader.setUniform("scale", glm::scale(glm::vec3(_structure.size.x, height, _structure.size.y)));
+    shader.setUniform("translate", glm::translate(glm::vec3(position.x, 0.0f, position.y)));
 
     shader.use();
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -145,7 +189,7 @@ void StructureRender::render(const glm::mat4& viewMat, const glm::ivec2& positio
     glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
     glBindVertexArray(0);
 
-    //glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     shader.unuse();
 }
