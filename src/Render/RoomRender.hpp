@@ -89,16 +89,16 @@ RoomRender::RoomRender() {}
 void RoomRender::bind(Room* room)
 {
     _room = room;
-    /*for (int i = 0; i < All; i++)
+    for (int i = 0; i < All; i++)
     {
         sr[i] = new StructureRender;
         sr[i]->bind(i);
-    } */
+    }
 
-    sr[NuclearPowerPlant] = new StructureRender;
-    sr[NuclearPowerPlant]->bind(NuclearPowerPlant);
+    //sr[NuclearPowerPlant] = new StructureRender;
+    //sr[NuclearPowerPlant]->bind(NuclearPowerPlant);
 
-    std::cout << "Sucessfully bind nuke" << std::endl;
+    std::cout << "Sucessfully bind all structures!" << std::endl;
 
     //backgroundInit();
     gridInit();
