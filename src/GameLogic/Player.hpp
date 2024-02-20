@@ -48,7 +48,12 @@ Player* Player::createTestPlayer()
             player->territory.push_back(glm::vec2(i, j));
     
     player->structureContained = {
-        { glm::vec2(0, 0), NuclearPowerPlant }
+        { glm::vec2(0, 0), NuclearPowerPlant },
+        { glm::vec2(2, 2), WindPowerPlant },
+        { glm::vec2(2, 0), ResidentialArea },
+        { glm::vec2(0, 2), FirePowerPlant},
+        { glm::vec2(4, 0), FireDepartment },
+        { glm::vec2(0, 4), Coal }
     };
     return player;
 }

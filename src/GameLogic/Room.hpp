@@ -14,7 +14,7 @@ public:
 
     void bind(const std::vector<Player*>& player);
 
-    void nextRound();
+    void roundUpdate();
 
     void addPlayer(Player* player) { _players.push_back(player); }
 
@@ -43,7 +43,7 @@ void Room::bind(const std::vector<Player*>& player)
     _players = player;
 }
 
-void Room::nextRound()
+void Room::roundUpdate()
 {
 
 }

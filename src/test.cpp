@@ -35,7 +35,9 @@ DoomsClock::DoomsClock() : AppSkeleton("Dooms Clock", true)
 
 void DoomsClock::render()
 {
-    renderer.render(float(width) / height);
+    int w, h;
+    SDL_GetMouseState(&w, &h);
+    renderer.render({width, height}, float(width) / height, glm::ivec2(w, h));
 }
 
 void DoomsClock::keydown(const SDL_Event* event)

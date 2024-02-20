@@ -28,11 +28,11 @@ const Vec3 VERTICES[] = {
 float initUVs[] = {
     /*0.5f, 0.5f,*/
     0.5f, -0.25f,
-    1.0f, 0.0f,
-    1.0f, 0.75f,
-    0.5f, 1.0f,
+    0.0f, 0.0f,
     0.0f, 0.75f,
-    0.0f, 0.0f//,
+    0.5f, 1.0f,
+    1.0f, 0.75f,
+    1.0f, 0.0f//,
     /*0.5f, 0.0f*/
 };
 
@@ -45,24 +45,24 @@ struct ImageData
 
 const char* imageFileName[All] = {
     "../asset/AIGenerated/bgRemoved/factory.png",
-    "../asset/AIGenerated/bgRemoved/firePowerPlant.png",
-    "../asset/AIGenerated/bgRemoved/nuclearPlant.png",
-    "../asset/AIGenerated/bgRemoved/fireDepartment.png",
-    "../asset/AIGenerated/bgRemoved/windPowerPlant.png",
-    "../asset/AIGenerated/bgRemoved/residentialArea.png",
-    "../asset/AIGenerated/bgRemoved/park.png",
-    "../asset/AIGenerated/bgRemoved/coal.png",
+    "../asset/AIGenerated/bgRemoved/firePowerPlant.png",//
+    "../asset/AIGenerated/bgRemoved/nuclearPlant.png",//
+    "../asset/AIGenerated/bgRemoved/fireDepartment.png",//
+    "../asset/AIGenerated/bgRemoved/windPowerPlant.png",//
+    "../asset/AIGenerated/bgRemoved/residentialArea.png",//
+    "../asset/AIGenerated/bgRemoved/park.png",//
+    "../asset/AIGenerated/bgRemoved/coal.png",//
     "../asset/AIGenerated/bgRemoved/farm.png",
     "../asset/AIGenerated/bgRemoved/storage.png"
 };
 
 float structureHeight[All] = {
     2.0f,
-    4.0f,
+    3.5f,
+    3.0f,
+    2.5f,
     2.0f,
-    4.0f,
-    4.0f,
-    4.0f,
+    2.0f,
     4.0f,
     2.0f,
     1.0f,
@@ -101,7 +101,9 @@ private:
 
 StructureRender::StructureRender()
 {
-    if (!initialized) initialize_structures();
+    if (!initialized) {
+        initialize_structures();
+    }
 } 
 
 StructureRender::~StructureRender()
@@ -115,8 +117,7 @@ StructureRender::~StructureRender()
 void StructureRender::bind(unsigned int structure)
 {
     if (
-        structure == Factory || structure == WindPowerPlant || structure == Coal ||
-        structure == Farm    || structure == Storage
+        structure == Factory|| structure == Farm || structure == Storage //|| structure == Coal
     ) return;
 
     shader.loadFromFile("../asset/shaders/structure.vs.glsl", "../asset/shaders/structure.fs.glsl");
@@ -138,6 +139,8 @@ void StructureRender::bind(unsigned int structure)
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    std::cout << "Generate VBO, VAO successfully!" << std::endl;
+
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -146,9 +149,10 @@ void StructureRender::bind(unsigned int structure)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+    std::cout << "Successfully generate tex para!" << std::endl;
+
     _structure = structures[structure];
     height = structureHeight[structure];
-
     imageData.data = stbi_load(
         imageFileName[structure], 
         &imageData.width, &imageData.height,
@@ -158,6 +162,8 @@ void StructureRender::bind(unsigned int structure)
         std::cerr << "Fail to load image data!\nFile: " << imageFileName[structure] << "\n";
     else 
     {
+        std::cout << "Successfully load image!" << std::endl;
+        std::cout << imageData.channel << std::endl;
         glTexImage2D(
             GL_TEXTURE_2D, 
             0,
@@ -171,6 +177,8 @@ void StructureRender::bind(unsigned int structure)
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0); 
     }
+
+    std::cout << "Successfully bind " << imageFileName[structure] << std::endl;
 }
 
 void StructureRender::render(const glm::mat4& viewMat, const glm::ivec2& position, const glm::mat4& projMat)

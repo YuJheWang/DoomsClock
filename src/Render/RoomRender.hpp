@@ -56,7 +56,7 @@ public:
 
     void bind(Room* room);
 
-    void render(float aspectRatio);
+    void render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos);
 
     glm::vec3 lookPoint = glm::vec3(1, 0, 1);
 
@@ -74,13 +74,15 @@ private:
 
     GLuint texture;
 
+    int width, height;
+
     void backgroundInit();
 
     void backgroundRender(float ar);
 
     void gridInit();
 
-    void gridRender(const glm::ivec2& pos);
+    void gridRender(const glm::ivec2& size, const glm::ivec2& pos, const glm::ivec2& mPos);
 
 };
 
@@ -104,7 +106,7 @@ void RoomRender::bind(Room* room)
     gridInit();
 }
 
-void RoomRender::render(float aspectRatio)
+void RoomRender::render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos)
 {
     camera.moveTo(glm::vec3(-1, sqrt(2), -1) * 5.0f + lookPoint);
     camera.lookAt(lookPoint);
@@ -122,11 +124,10 @@ void RoomRender::render(float aspectRatio)
             );
         }
     }
-    //backgroundRender(aspectRatio);
 
     for (int i = 0 ; i < 27; i++)
         for (int j = 0; j < 27; j++)
-            gridRender(glm::ivec2(i, j));
+            gridRender({width, height}, glm::ivec2(i, j), mPos);
 }
 
 void RoomRender::backgroundInit()
@@ -222,12 +223,13 @@ void RoomRender::gridInit()
     glBindVertexArray(0);
 }
 
-void RoomRender::gridRender(const glm::ivec2& pos)
+void RoomRender::gridRender(const glm::ivec2& size, const glm::ivec2& pos, const glm::ivec2& mPos)
 {
     gridsShader.setUniform("viewMat", camera.getViewMatrix());
     gridsShader.setUniform("projMat", glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f));
     gridsShader.setUniform("translate", glm::translate(glm::vec3(pos.x, 0.0f, pos.y)));
     gridsShader.setUniform("position", pos);
+    gridsShader.setUniform("mousePos", glm::vec2(mPos.x / float(size.x), mPos.y / float(size.y)));
 
     gridsShader.use();
 

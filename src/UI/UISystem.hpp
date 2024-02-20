@@ -7,13 +7,15 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
 
-#include "homePage.hpp"
+#include "UIBase.hpp"
 
 class UISystem
 {
 public:
 
     UISystem(SDL_Window* window, SDL_GLContext context);
+
+    void bind(UIBase* ui) { currentUI = ui; }
 
     void loop(SDL_Event& event);
 
@@ -34,8 +36,6 @@ UISystem::UISystem(SDL_Window* window, SDL_GLContext context)
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
     //io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-    currentUI = new HomePage;
 
     ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init();
