@@ -74,12 +74,12 @@ void DoomsClock::mouseDown(const SDL_Event* event)
             return mousePos;
         }
         mouseState.update();
-        mouseState.getDelta(&dx, &dy);
 
-        std::cout << mousePos.x << " " << mousePos.z << std::endl;
+        glm::vec4 prevPos = getMousePos(mouseState.prevX, mouseState.prevY);
+        glm::vec4 currentPos = getMousePos(mouseState.x, mouseState.y);
+        glm::vec4 delta = currentPos - prevPos;
 
-        
-        renderer.lookPoint += glm::vec3(mousePos.x, 0, mousePos.z);
+        renderer.lookPoint += delta;
     }
 }
 
