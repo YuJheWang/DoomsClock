@@ -79,7 +79,7 @@ public:
 
     void bind(unsigned int structure);
 
-    void render(const glm::mat4& viewMat, const glm::ivec2& position, const glm::mat4& projMat);
+    void render(const glm::mat4& viewMat, const glm::ivec2& position, const glm::mat4& projMat, float r);
 
 private:
 
@@ -181,12 +181,17 @@ void StructureRender::bind(unsigned int structure)
     std::cout << "Successfully bind " << imageFileName[structure] << std::endl;
 }
 
-void StructureRender::render(const glm::mat4& viewMat, const glm::ivec2& position, const glm::mat4& projMat)
+void StructureRender::render(
+    const glm::mat4& viewMat, 
+    const glm::ivec2& position, 
+    const glm::mat4& projMat, 
+    float colorRatio)
 {
     shader.setUniform("viewMat", viewMat);
     shader.setUniform("projMat", projMat);
     shader.setUniform("scale", glm::scale(glm::vec3(_structure.size.x, height, _structure.size.y)));
     shader.setUniform("translate", glm::translate(glm::vec3(position.x, 0.0f, position.y)));
+    shader.setUniform("colorRatio", colorRatio);
 
     shader.use();
     

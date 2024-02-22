@@ -20,6 +20,8 @@ public:
 
     virtual void keydown(const SDL_Event* event) {}
 
+    virtual void mouseDown(const SDL_Event* event) {}
+
     ~AppSkeleton();
 
 protected:
@@ -27,6 +29,33 @@ protected:
     int width, height;
 
     float wheel;
+
+    struct MouseState
+    {
+        int prevX, prevY;
+        int x = -1, y = -1;
+        bool continuePress = false;
+
+        //Call update before you getDelta.
+        void getDelta(int* dx, int* dy) 
+        { 
+            if (!continuePress) { *dx = 0, *dy = 0; return; }  
+            *dx = x - prevX; *dy = y - prevY;
+            std::cout << *dx << " " << *dy << std::endl;
+        }
+        void update() 
+        {  
+            if (!continuePress) 
+            {
+                SDL_GetMouseState(&prevX, &prevY); 
+                SDL_GetMouseState(&x, &y); 
+                continuePress = true;
+                return;
+            }
+            prevX = x, prevY = y; 
+            SDL_GetMouseState(&x, &y); 
+        }
+    } mouseState;
 
 private:
 
@@ -111,6 +140,14 @@ void AppSkeleton::loop()
             else if (event.type == SDL_MOUSEWHEEL)
             {
                 wheel = event.wheel.preciseY;
+            }
+            else if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                mouseDown(&event);
+            }
+            else if (event.type == SDL_MOUSEBUTTONUP)
+            {
+                mouseState.continuePress = false;
             }
         }
 

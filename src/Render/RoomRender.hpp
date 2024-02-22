@@ -4,6 +4,8 @@
 
 #include "StructureRender.hpp"
 
+#include <stdio.h>
+
 struct Vertex
 {
     float x, y, z;
@@ -29,10 +31,6 @@ const Vec3 gridVertices[] = {
     { 0.95f, 0.05f, 0.05f }
 };
 
-const float colorRatios[] = {
-    1, 1, 1, 1, 0.707f, 0.707f, 0.707f, 0.707f
-};
-
 const unsigned int gridIndices[] = {
     4, 5, 6,
     4, 6, 7,
@@ -50,6 +48,8 @@ class RoomRender
 {
 public:
 
+    friend class Player;
+
     RoomRender();
 
     ~RoomRender() { delete _room; }
@@ -57,6 +57,8 @@ public:
     void bind(Room* room);
 
     void render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos);
+
+    glm::mat4 getCamViewMat() { return camera.getViewMatrix(); }
 
     glm::vec3 lookPoint = glm::vec3(1, 0, 1);
 
@@ -91,43 +93,62 @@ RoomRender::RoomRender() {}
 void RoomRender::bind(Room* room)
 {
     _room = room;
+    auto players = _room->getPlayers();
+    lookPoint = glm::vec3(players[0]->initLookAtPos.x, 0, players[0]->initLookAtPos.y);
+
     for (int i = 0; i < All; i++)
     {
         sr[i] = new StructureRender;
         sr[i]->bind(i);
     }
-
-    //sr[NuclearPowerPlant] = new StructureRender;
-    //sr[NuclearPowerPlant]->bind(NuclearPowerPlant);
-
     std::cout << "Sucessfully bind all structures!" << std::endl;
-
-    //backgroundInit();
     gridInit();
 }
 
 void RoomRender::render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos)
 {
-    camera.moveTo(glm::vec3(-1, sqrt(2), -1) * 5.0f + lookPoint);
+    auto players = _room->getPlayers();
+
+    camera.moveTo(glm::vec3(-1, sqrt(2), -1) * 20.0f + lookPoint);
     camera.lookAt(lookPoint);
 
-    auto players = _room->getPlayers();
+    glm::vec2 normalizedMousePos = 
+        glm::vec2(mPos.x / float(size.x), mPos.y / float(size.y)) * 2.0f - 1.0f;
+    normalizedMousePos.y = -normalizedMousePos.y;
+    glm::mat4 projMat = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f);
+
+    for (int i = 0 ; i < 27; i++)
+        for (int j = 0; j < 27; j++)
+            gridRender(size, glm::ivec2(i, j), mPos);
+
     for (auto player : players)
     {
         auto structureContained = player->getContainedStructure();
         for (auto structure : structureContained)
         {
+            glm::mat4 translate = glm::translate(glm::vec3(structure.first.x, 0.0f, structure.first.y));
+            glm::vec4 mousePos = 
+                glm::inverse(projMat * camera.getViewMatrix() * translate) *
+                glm::vec4(normalizedMousePos, 0.0f, 1.0f);
+
+            float k = sqrt(2) * mousePos.y;
+            mousePos += glm::vec4(0.5f, -sqrt(2) / 2.0f, 0.5f, 0.0f) * k;
+            glm::vec2 currentPos(mousePos.x, mousePos.z);
+
+            int width = structures[structure.second].size.x,
+                height = structures[structure.second].size.y;
+            float colorRatio = 1.0f;
+            if (currentPos.x >= 0 && currentPos.x < width && currentPos.y >= 0 && currentPos.y < height) 
+                colorRatio = 1.5f;
+            
             sr[structure.second]->render(
                 camera.getViewMatrix(), 
                 structure.first,
-                glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f)
+                projMat,
+                colorRatio
             );
         }
     }
-
-    for (int i = 0 ; i < 27; i++)
-        for (int j = 0; j < 27; j++)
-            gridRender({width, height}, glm::ivec2(i, j), mPos);
 }
 
 void RoomRender::backgroundInit()
@@ -205,8 +226,7 @@ void RoomRender::gridInit()
 
     glGenBuffers(1, &gridVBO);
     glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices) + sizeof(colorRatios), gridVertices, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(gridVertices), sizeof(colorRatios), colorRatios);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &gridEBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridEBO);
@@ -215,9 +235,6 @@ void RoomRender::gridInit()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3), (void*) 0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)(sizeof(gridVertices)));
-    glEnableVertexAttribArray(1);
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -225,11 +242,21 @@ void RoomRender::gridInit()
 
 void RoomRender::gridRender(const glm::ivec2& size, const glm::ivec2& pos, const glm::ivec2& mPos)
 {
-    gridsShader.setUniform("viewMat", camera.getViewMatrix());
-    gridsShader.setUniform("projMat", glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f));
-    gridsShader.setUniform("translate", glm::translate(glm::vec3(pos.x, 0.0f, pos.y)));
+    glm::mat4 projMat = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f),
+        viewMat = camera.getViewMatrix(),
+        translate = glm::translate(glm::vec3(pos.x, 0.0f, pos.y));
+
+    glm::vec2 normalizedMousePos = 
+        glm::vec2(mPos.x / float(size.x), mPos.y / float(size.y)) * 2.0f - 1.0f;
+    normalizedMousePos.y = -normalizedMousePos.y;
+
+    gridsShader.setUniform("viewMat", viewMat);
+    gridsShader.setUniform("projMat", projMat);
+    gridsShader.setUniform("translate", translate);
     gridsShader.setUniform("position", pos);
-    gridsShader.setUniform("mousePos", glm::vec2(mPos.x / float(size.x), mPos.y / float(size.y)));
+    gridsShader.setUniform("mousePos", 
+        normalizedMousePos
+    );
 
     gridsShader.use();
 

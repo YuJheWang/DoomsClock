@@ -8,9 +8,13 @@
 #define POSITION first
 #define STRUCTURE_INDEX second
 
+class RoomRender;
+
 class Player
 {
 public:
+
+    friend class RoomRender;
 
     Player();
 
@@ -32,6 +36,8 @@ private:
 
     std::vector<glm::vec2> territory;
 
+    glm::vec2 initLookAtPos;
+
 };
 
 Player::Player() 
@@ -42,6 +48,8 @@ Player::Player()
 Player* Player::createTestPlayer()
 {           
     Player* player = new Player;
+
+    player->initLookAtPos = glm::vec2(3.0f, 3.0f);
 
     for (int i = 0; i < 9; i++)
         for (int j = 0; j < 9; j++)
