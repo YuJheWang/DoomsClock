@@ -117,7 +117,7 @@ StructureRender::~StructureRender()
 void StructureRender::bind(unsigned int structure)
 {
     if (
-        structure == Factory|| structure == Farm || structure == Storage //|| structure == Coal
+        structure == Factory|| structure == Farm || structure == Storage
     ) return;
 
     shader.loadFromFile("../asset/shaders/structure.vs.glsl", "../asset/shaders/structure.fs.glsl");
