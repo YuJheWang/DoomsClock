@@ -58,22 +58,28 @@ void DoomsClock::mouseDown(const SDL_Event* event)
     int dx, dy;
     if (event->button.button == SDL_BUTTON_RIGHT)
     {
+        auto getMousePos = [&](int x, int y) 
+        {
+            glm::vec2 normalizedMousePos = 
+                glm::vec2(dx / float(width), dy / float(height)) * 2.0f - 1.0f;
+            normalizedMousePos.y = -normalizedMousePos.y;
+            glm::mat4 projMat = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f);
+
+            glm::vec4 mousePos = 
+                glm::inverse(projMat * renderer.getCamViewMat()) *
+                glm::vec4(normalizedMousePos, 0.0f, 1.0f);
+                float k = sqrt(2) * mousePos.y;
+                mousePos += glm::vec4(0.5f, -sqrt(2) / 2.0f, 0.5f, 0.0f) * k;
+
+            return mousePos;
+        }
         mouseState.update();
         mouseState.getDelta(&dx, &dy);
-        glm::vec2 normalizedMouseDelta = 
-        glm::vec2(dx / float(width), dy / float(height)) * 2.0f - 1.0f;
-        normalizedMouseDelta.y = -normalizedMouseDelta.y;
-        glm::mat4 projMat = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f);
-
-        glm::vec4 mousePos = 
-            glm::inverse(projMat * renderer.getCamViewMat()) *
-            glm::vec4(normalizedMouseDelta, 0.0f, 1.0f);
 
         std::cout << mousePos.x << " " << mousePos.z << std::endl;
 
-        float k = sqrt(2) * mousePos.y;
-        mousePos += glm::vec4(0.5f, -sqrt(2) / 2.0f, 0.5f, 0.0f) * k;
-        renderer.lookPoint += glm::vec3(mousePos.x, 0, mousePos.z); 
+        
+        renderer.lookPoint += glm::vec3(mousePos.x, 0, mousePos.z);
     }
 }
 
