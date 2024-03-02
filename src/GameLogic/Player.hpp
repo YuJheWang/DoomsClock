@@ -38,6 +38,8 @@ private:
 
     glm::vec2 initLookAtPos;
 
+    Resources resourcesYouHave = { 0, 0, 0, 0 };
+
 };
 
 Player::Player() 

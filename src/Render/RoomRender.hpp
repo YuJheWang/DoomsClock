@@ -56,7 +56,7 @@ public:
 
     void bind(Room* room);
 
-    void render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos);
+    void render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos, float zoom);
 
     glm::mat4 getCamViewMat() { return camera.getViewMatrix(); }
 
@@ -84,7 +84,11 @@ private:
 
     void gridInit();
 
-    void gridRender(const glm::ivec2& size, const glm::ivec2& pos, const glm::ivec2& mPos);
+    void gridRender(
+        const glm::ivec2& size, 
+        const glm::ivec2& pos, const glm::ivec2& mPos, 
+        const glm::mat4& projMat
+    );
 
 };
 
@@ -105,7 +109,7 @@ void RoomRender::bind(Room* room)
     gridInit();
 }
 
-void RoomRender::render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos)
+void RoomRender::render(const glm::ivec2& size, float aspectRatio, const glm::ivec2& mPos, float zoom)
 {
     auto players = _room->getPlayers();
 
@@ -115,11 +119,15 @@ void RoomRender::render(const glm::ivec2& size, float aspectRatio, const glm::iv
     glm::vec2 normalizedMousePos = 
         glm::vec2(mPos.x / float(size.x), mPos.y / float(size.y)) * 2.0f - 1.0f;
     normalizedMousePos.y = -normalizedMousePos.y;
-    glm::mat4 projMat = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f);
+    glm::mat4 projMat = glm::ortho(
+        -8.0f * zoom, 8.0f * zoom, 
+        -4.5f * zoom, 4.5f * zoom, 
+        0.01f, 100.0f
+    );
 
     for (int i = 0 ; i < 27; i++)
         for (int j = 0; j < 27; j++)
-            gridRender(size, glm::ivec2(i, j), mPos);
+            gridRender(size, glm::ivec2(i, j), mPos, projMat);
 
     for (auto player : players)
     {
@@ -240,10 +248,12 @@ void RoomRender::gridInit()
     glBindVertexArray(0);
 }
 
-void RoomRender::gridRender(const glm::ivec2& size, const glm::ivec2& pos, const glm::ivec2& mPos)
-{
-    glm::mat4 projMat = glm::ortho(-8.0f, 8.0f, -4.5f, 4.5f, 0.01f, 100.0f),
-        viewMat = camera.getViewMatrix(),
+void RoomRender::gridRender(
+    const glm::ivec2& size, 
+    const glm::ivec2& pos, const glm::ivec2& mPos, 
+    const glm::mat4& projMat
+) {
+    glm::mat4 viewMat = camera.getViewMatrix(),
         translate = glm::translate(glm::vec3(pos.x, 0.0f, pos.y));
 
     glm::vec2 normalizedMousePos = 

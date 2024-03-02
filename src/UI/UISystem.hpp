@@ -51,7 +51,8 @@ void UISystem::loop(SDL_Event& event)
 
     ImGui::StyleColorsLight();
 
-    currentUI->render();
+    bool isRender = true;
+    currentUI->render(&isRender);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

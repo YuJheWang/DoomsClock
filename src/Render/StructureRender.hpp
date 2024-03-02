@@ -63,7 +63,7 @@ float structureHeight[All] = {
     2.5f,
     2.0f,
     2.0f,
-    4.0f,
+    3.0f,
     2.0f,
     1.0f,
     4.0f
@@ -98,6 +98,111 @@ private:
     bool initialized = false;
 
 };
+
+class StructureImageRender
+{
+public:
+
+    StructureImageRender();
+
+    void render(Uint8 structure, const glm::vec2& mousePosOnScreen, const glm::vec2& screenSize);
+
+private:
+
+    GLuint vbo, vao;
+
+    GLuint textures[All];
+
+    Shader shader;
+
+    ImageData imagesData[All];
+
+    float vertices[16] = {
+        0.0f, 0.0f, 0.0f, 0.0f,
+        150.0f, 0.0f, 1.0f, 0.0f,
+        150.0f, 150.0f, 1.0f, 1.0f,
+        0.0f, 150.0f, 0.0f, 1.0f
+    };
+
+};
+
+StructureImageRender::StructureImageRender()
+{
+    shader.loadFromFile("../asset/shaders/image.vs.glsl", "../asset/shaders/image.fs.glsl");
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*) (sizeof(float) * 2));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenTextures(All, textures);
+    for (int i = 0; i < All; i++)
+    {
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+    
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        imagesData[i].data = stbi_load(
+            imageFileName[i], 
+            &imagesData[i].width, &imagesData[i].height, 
+            &imagesData[i].channel, 0
+        );
+        if (imagesData[i].data == nullptr)
+            std::cout << "Fail to load image! ID: " << i << std::endl;
+        else 
+        {
+            glTexImage2D(
+                GL_TEXTURE_2D, 
+                0, 
+                GL_RGBA, 
+                imagesData[i].width, imagesData[i].height, 
+                0, 
+                GL_RGBA, 
+                GL_UNSIGNED_BYTE,
+                imagesData[i].data
+            );
+            glGenerateMipmap(GL_TEXTURE_2D);
+            stbi_image_free(imagesData[i].data);
+        }
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+}
+
+void StructureImageRender::render(
+    Uint8 structure, 
+    const glm::vec2& mousePosOnScreen, 
+    const glm::vec2& screenSize
+) {
+    if (
+        structure == Factory|| structure == Farm || structure == Storage || structure == All
+    ) return;
+
+    glm::mat4 MVP = glm::ortho(0.0f, screenSize.x, screenSize.y, 0.0f) 
+        * glm::translate(glm::vec3(mousePosOnScreen + glm::vec2{-75.0f, -150.0f}, 0.0f));
+
+    shader.setUniform("MVP", MVP);
+
+    shader.use();
+    glBindTexture(GL_TEXTURE_2D, textures[structure]);
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
+    shader.unuse();
+}
 
 StructureRender::StructureRender()
 {

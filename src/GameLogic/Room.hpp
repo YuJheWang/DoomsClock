@@ -18,7 +18,7 @@ public:
 
     void addPlayer(Player* player) { _players.push_back(player); }
 
-    std::vector<Player*> getPlayers() { return _players; }
+    std::vector<Player*>& getPlayers() { return _players; }
 
     static Room* createTestRoom();
 

@@ -7,6 +7,7 @@
 #include <SDL2/SDL_opengl.h>
 
 #include "Render/shader.hpp"
+#include "UI/UI.hpp"
 
 class AppSkeleton
 {
@@ -22,6 +23,12 @@ public:
 
     virtual void mouseDown(const SDL_Event* event) {}
 
+    virtual void mouseUp(const SDL_Event* event) {}
+
+    virtual void mouseMotion(const SDL_Event* event) {} 
+    
+    virtual void mouseWheel(const SDL_Event* event) {} 
+
     ~AppSkeleton();
 
 protected:
@@ -35,6 +42,7 @@ protected:
         int prevX, prevY;
         int x = -1, y = -1;
         bool continuePress = false;
+        Uint32 activatedButton = 0;
 
         //Call update before you getDelta.
         void getDelta(int* dx, int* dy) 
@@ -57,11 +65,11 @@ protected:
         }
     } mouseState;
 
-private:
-
     SDL_Window* window = nullptr;
 
     SDL_GLContext context = nullptr;
+
+private:
 
     bool running = true, _fullscreen;
 
@@ -109,6 +117,8 @@ AppSkeleton::AppSkeleton(const char* title, bool fullscreen) : _fullscreen(fulls
     }
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_DST_ALPHA);
 
     SDL_GetWindowSize(window, &width, &height);
     glViewport(0, 0, width, height);
@@ -122,6 +132,7 @@ void AppSkeleton::loop()
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 running = false;
             else if (event.type == SDL_WINDOWEVENT_SIZE_CHANGED)
@@ -137,17 +148,21 @@ void AppSkeleton::loop()
                         running = false;
                 keydown(&event);
             }
-            else if (event.type == SDL_MOUSEWHEEL)
-            {
-                wheel = event.wheel.preciseY;
-            }
             else if (event.type == SDL_MOUSEBUTTONDOWN)
             {
                 mouseDown(&event);
             }
             else if (event.type == SDL_MOUSEBUTTONUP)
             {
-                mouseState.continuePress = false;
+                mouseUp(&event);
+            }
+            else if (event.type == SDL_MOUSEMOTION)
+            {
+                mouseMotion(&event);
+            }
+            else if (event.type == SDL_MOUSEWHEEL)
+            {
+                mouseWheel(&event);
             }
         }
 

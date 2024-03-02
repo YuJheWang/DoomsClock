@@ -10,43 +10,45 @@ class UIBase
 {
 public:
 
-    UIBase() = default;
+    UIBase(SDL_Window* window, SDL_GLContext context) : window(window), context(context) {}
 
-    virtual void render() = 0;
+    void loadImGui();
+
+    void renderToWindow(bool* flag);
+
+    virtual void render(bool* flag) = 0;
 
 private:
 
     std::string bottomRowTitle, rightColumnTitle;
 
+    SDL_Window* window;
+
+    SDL_GLContext context;
+
     void popup();
-
-    void renderStructureSelection();
-
-    void renderResourcesViewer();
-
-    void renderHomePage();
-
-    void switchToGamePlaying();
-
-    void switchToHomePage();
 
 };
 
-UIBase::UIBase()
+
+void UIBase::loadImGui()
 {
-    
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    ImGui_ImplSDL2_InitForOpenGL(window, context);
+    ImGui_ImplOpenGL3_Init("#version 430 core");
 }
 
-void UIBase::renderHomePage()
+void UIBase::renderToWindow(bool* flag)
 {
-    bool isOpen;
-    ImGui::Begin("Room", nullptr, ImGuiWindowFlags_NoTitleBar);
-    ImGui::Button("Create New Room");
-    ImGui::Button("Join Room");
-    ImGui::End();
-}
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
 
-void UIBase::renderStructureSelection()
-{
-    ImGui::Begin("Structures");
+    render(flag);
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui::EndFrame();
 }
