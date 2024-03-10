@@ -6,6 +6,7 @@
 
 #include <glad/glad.h>
 #include <GameLogic/Structures.hpp>
+#include <GameLogic/Measure/Measure.hpp>
 
 #include "shader.hpp"
 #include "Camera.hpp"
@@ -53,7 +54,8 @@ const char* imageFileName[All] = {
     "../asset/AIGenerated/bgRemoved/park.png",//
     "../asset/AIGenerated/bgRemoved/coal.png",//
     "../asset/AIGenerated/bgRemoved/farm.png",
-    "../asset/AIGenerated/bgRemoved/storage.png"
+    "../asset/AIGenerated/bgRemoved/storage.png",
+    ""
 };
 
 float structureHeight[All] = {
@@ -66,7 +68,28 @@ float structureHeight[All] = {
     3.0f,
     2.0f,
     1.0f,
-    4.0f
+    3.5f
+};
+
+const char* structureCardImages[All] = {
+    "../asset/CardImages/Factory.png",
+    "../asset/CardImages/FirePowerPlant.png",
+    "../asset/CardImages/Nuclear.png",
+    "../asset/CardImages/fireDepartment.png",
+    "../asset/CardImages/windTurbine.png",
+    "../asset/CardImages/ResidentialArea.png",
+    "../asset/CardImages/park.png",
+    "../asset/CardImages/coal.png",
+    "../asset/CardImages/farm.png",
+    "../asset/CardImages/storage.png",
+    ""
+};
+
+const char* measureCardImage[AllM] = {
+    "../asset/CardImages/DestroyStructure.png",
+    "../asset/CardImages/ExtinguishFire.png",
+    "../asset/CardImages/CutTree.png",
+    "../asset/CardImages/PlantTree.png"
 };
 
 class StructureRender
@@ -149,6 +172,7 @@ StructureImageRender::StructureImageRender()
     glGenTextures(All, textures);
     for (int i = 0; i < All; i++)
     {
+        if (i == Tree) continue;
         glBindTexture(GL_TEXTURE_2D, textures[i]);
     
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -186,9 +210,7 @@ void StructureImageRender::render(
     const glm::vec2& mousePosOnScreen, 
     const glm::vec2& screenSize
 ) {
-    if (
-        structure == Factory|| structure == Farm || structure == Storage || structure == All
-    ) return;
+    if (structure == All) return;
 
     glm::mat4 MVP = glm::ortho(0.0f, screenSize.x, screenSize.y, 0.0f) 
         * glm::translate(glm::vec3(mousePosOnScreen + glm::vec2{-75.0f, -150.0f}, 0.0f));
@@ -221,10 +243,7 @@ StructureRender::~StructureRender()
 
 void StructureRender::bind(unsigned int structure)
 {
-    if (
-        structure == Factory|| structure == Farm || structure == Storage
-    ) return;
-
+    if (structure == Tree) return;
     shader.loadFromFile("../asset/shaders/structure.vs.glsl", "../asset/shaders/structure.fs.glsl");
 
     glGenVertexArrays(1, &vao);

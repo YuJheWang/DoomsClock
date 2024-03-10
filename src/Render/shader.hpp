@@ -169,7 +169,7 @@ private:
         glGetProgramiv(id, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(id, 512, NULL, infoLog);
-            std::cerr << "Fail to link program!" << std::endl;
+            std::cerr << "Fail to link program! info log : \n" << infoLog << std::endl;
         }
 
         glDeleteShader(vs);

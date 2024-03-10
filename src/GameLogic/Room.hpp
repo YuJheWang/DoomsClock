@@ -20,7 +20,7 @@ public:
 
     std::vector<Player*>& getPlayers() { return _players; }
 
-    static Room* createTestRoom();
+    static Room* createInitRoom();
 
 private:
 
@@ -48,9 +48,9 @@ void Room::roundUpdate()
 
 }
 
-Room* Room::createTestRoom()
+Room* Room::createInitRoom()
 {
     Room* room = new Room;
-    room->_players.push_back(Player::createTestPlayer());
+    room->_players.push_back(Player::createInitPlayer());
     return room;
 }

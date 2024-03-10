@@ -62,6 +62,8 @@ public:
 
     glm::vec3 lookPoint = glm::vec3(1, 0, 1);
 
+    bool isAnyStructureBind = false;
+
 private:
 
     StructureRender *sr[All];
@@ -102,6 +104,7 @@ void RoomRender::bind(Room* room)
 
     for (int i = 0; i < All; i++)
     {
+        if (i == Tree) continue;
         sr[i] = new StructureRender;
         sr[i]->bind(i);
     }
@@ -264,9 +267,21 @@ void RoomRender::gridRender(
     gridsShader.setUniform("projMat", projMat);
     gridsShader.setUniform("translate", translate);
     gridsShader.setUniform("position", pos);
-    gridsShader.setUniform("mousePos", 
-        normalizedMousePos
-    );
+
+    glm::mat4 MVP = projMat * viewMat * translate;
+    glm::vec3 mousePos = {
+        (inverse(MVP) * glm::vec4(normalizedMousePos, 0.0f, 1.0f)).x,
+        (inverse(MVP) * glm::vec4(normalizedMousePos, 0.0f, 1.0f)).y,
+        (inverse(MVP) * glm::vec4(normalizedMousePos, 0.0f, 1.0f)).z
+    };
+    float k = sqrt(2) * mousePos.y;
+    mousePos += glm::vec3(0.5, -sqrt(2) / 2.0, 0.5) * k;
+
+    gridsShader.setUniform("mousePos", mousePos);
+
+    auto player = _room->getPlayers()[0];
+    bool isRed = player->isAnyNeighbor(pos, {1, 1});
+    gridsShader.setUniform("isRed", isRed);
 
     gridsShader.use();
 

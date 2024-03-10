@@ -49,9 +49,10 @@ private:
 
 DoomsClock::DoomsClock() : AppSkeleton("Dooms Clock", true)
 {
-    currentRoom = Room::createTestRoom();
+    currentRoom = Room::createInitRoom();
     renderer.bind(currentRoom);
     su = new StructureUI(window, context);
+    su->bindPlayer(currentRoom->getPlayers()[0]);
     su->loadImGui();
 
     sir = new StructureImageRender;
@@ -61,10 +62,7 @@ void DoomsClock::render()
 {
     int x, y;
     SDL_GetMouseState(&x, &y);
-    /*if (su->getCurrentBindStructure() != All)
-    {
-        
-    }*/
+    renderer.isAnyStructureBind = su->getCurrentBindStructure() != All;
     renderer.render({width, height}, float(width) / height, glm::ivec2(x, y), zoom);
     su->renderToWindow(flags + StructureUIIndex);
     glDisable(GL_DEPTH_TEST);
@@ -130,6 +128,7 @@ void DoomsClock::mouseUp(const SDL_Event* event)
 {
     if (event->button.button == SDL_BUTTON_LEFT)
     {
+        ImGui::SetNextWindowCollapsed(false);
         mouseState.continuePress = false;
         mouseState.activatedButton = 0;
         if (su->getCurrentBindStructure() != All)
@@ -138,7 +137,19 @@ void DoomsClock::mouseUp(const SDL_Event* event)
                 su->getCurrentBindStructure() = All;
             auto& structure = su->getCurrentBindStructure();
             currentRoom->getPlayers()[0]->addStructure({{currentPos.x, currentPos.z}, structure});
+            currentRoom->getPlayers()[0]->useStructureCard(structure, {currentPos.x, currentPos.z}); 
             structure = All;
+        }
+        if (su->getCurrentBindMeasure() != AllM)
+        {
+            if (currentPos.x < 0 || currentPos.z < 0 || currentPos.x > 27 || currentPos.y > 27)
+                su->getCurrentBindMeasure() = AllM;
+            else
+            {
+                auto& measure = su->getCurrentBindMeasure();
+                currentRoom->getPlayers()[0]->useMeasureCard(measure, { currentPos.x, currentPos.z });
+                measure = AllM;
+            }
         }
     }
     else if (event->button.button == SDL_BUTTON_RIGHT)

@@ -6,6 +6,7 @@
 struct Resources { int log, iron, coal, food; };
 
 struct Size { unsigned int x, y; };
+bool operator==(Size a, Size b) { return (a.x == b.x && a.y == b.y); }
 
 struct Structure
 {
@@ -41,6 +42,7 @@ enum StructureIndex {
     Coal,
     Farm,
     Storage,
+    Tree,
     All
 };
 Structure structures[All]; //Store the informations of all kind of structures.
@@ -52,12 +54,12 @@ void initialize_structures()
         "工廠",         //name
         {1, 1, 1, 0},   //resourceCost     {log, iron, coal, food}
         0,              //populationGain
-        {2, 1},         //size
+        {2, 2},         //size
         3,              //deltaClock
         false,          //earthquakeResist 耐震:true、不耐震:false
         false,          //flamable         易燃:true、不易燃:false
         3,              //electricCost
-        ""              //description      先空著，我到時候再想 我好帥
+        ""              //description      先空著，我到時候再想
     };
     structures[FirePowerPlant] = {
         "火力發電廠",
@@ -151,7 +153,7 @@ void initialize_structures()
         "糧倉",
         {2, 0, 0, 0},
         0,
-        {2, 1},
+        {2, 2},
         0,
         false,
         true,
